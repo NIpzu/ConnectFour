@@ -30,7 +30,7 @@ private:
 	void ChangeTurn();
 	GameState Win() const;
 	Pieces CurrentPlayer() const;
-	bool CheckForVictory(int iOrigin);
+	void CheckForVictory(int iOrigin);
 private:
 	Pieces board[numRows * numColumns] = { Pieces::none };
 	GameState state = GameState::player0turn;

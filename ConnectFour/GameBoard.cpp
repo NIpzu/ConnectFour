@@ -1,5 +1,6 @@
-#include "GameBoard.h"
 #include <algorithm>
+#include <iostream>
+#include "GameBoard.h"
 
 GameBoard::GameBoard()
 {
@@ -7,17 +8,22 @@ GameBoard::GameBoard()
 
 GameState GameBoard::AddPiece(int iColumn)
 {
-	for (int i = 0; i < numRows; i++)
+	if (CurrentPlayer() != Pieces::none)
 	{
-		if (board[i * numColumns + iColumn] == Pieces::none)
+		for (int i = 0; i < numRows; i++)
 		{
-			board[i * numColumns + iColumn] = CurrentPlayer();
-			CheckForVictory(i * numColumns + iColumn);
-			ChangeTurn();
-			return state;
+			if (board[i * numColumns + iColumn] == Pieces::none)
+			{
+				board[i * numColumns + iColumn] = CurrentPlayer();
+				CheckForVictory(i * numColumns + iColumn);
+				ChangeTurn();
+				return state;
+			}
 		}
+		state = GameState::invalidMove;
+		std::cout << "Invalid move!" << std::endl;
 	}
-	state = GameState::invalidMove;
+	std::cout << "Can't move now!" << std::endl;
 	return state;
 }
 
@@ -73,7 +79,7 @@ Pieces GameBoard::CurrentPlayer() const
 	}
 }
 
-bool GameBoard::CheckForVictory(int iOrigin)
+void GameBoard::CheckForVictory(int iOrigin)
 {
 	const Pieces checkForPiece = board[iOrigin];
 	int originY = iOrigin / numColumns;
@@ -98,7 +104,7 @@ bool GameBoard::CheckForVictory(int iOrigin)
 	if (originX != 0)
 	{
 
-		for (int x = originX - 1; x > std::max(originX - 4, 0); x--)
+		for (int x = originX - 1; x >= std::max(originX - 4, 0); x--)
 		{
 			if (board[originY * numColumns + x] == checkForPiece)
 			{
@@ -113,9 +119,8 @@ bool GameBoard::CheckForVictory(int iOrigin)
 	if (xCount >= 4)
 	{
 		state = Win();
+		std::cout << "Player " << (state == GameState::player0wins ? "0" : "1") << " wins!" << std::endl;
 	}
 
 
-
-	return false;
 }

@@ -9,7 +9,7 @@ GameBoardWindow::GameBoardWindow()
 	{
 		PieceSprites[i].setFillColor(emptycolor);
 		PieceSprites[i].setRadius(float(circleDiameter) / 2.0f);
-		PieceSprites[i].setPosition(sf::Vector2f(i % GameBoard::numColumns * circleDiameter, ((GameBoard::numRows-1) * circleDiameter) - ( i / GameBoard::numColumns) * circleDiameter) );
+		PieceSprites[i].setPosition(sf::Vector2f(float(i % GameBoard::numColumns * circleDiameter),float((GameBoard::numRows - 1) * circleDiameter - i / GameBoard::numColumns * circleDiameter)));
 	}
 }
 
