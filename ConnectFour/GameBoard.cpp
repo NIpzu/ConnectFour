@@ -98,7 +98,7 @@ bool GameBoard::CheckForVictory(int iOrigin)
 	if (originX != 0)
 	{
 
-		for (int x = originX - 1; x < std::max(originX - 4, 0); x--)
+		for (int x = originX - 1; x > std::max(originX - 4, 0); x--)
 		{
 			if (board[originY * numColumns + x] == checkForPiece)
 			{
