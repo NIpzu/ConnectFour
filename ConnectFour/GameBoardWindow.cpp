@@ -31,36 +31,133 @@ void GameBoardWindow::Update()
 	{
 		if (event.type == sf::Event::Closed)
 			win.close();
-		if (event.type == sf::Event::KeyPressed)
-		{
-			switch (event.key.code)
-			{
-			case sf::Keyboard::Num1:
-				AddPiece(0);
-				break;
-			case sf::Keyboard::Num2:
-				AddPiece(1);
-				break;
-			case sf::Keyboard::Num3:
-				AddPiece(2);
-				break;
-			case sf::Keyboard::Num4:
-				AddPiece(3);
-				break;
-			case sf::Keyboard::Num5:
-				AddPiece(4);
-				break;
-			case sf::Keyboard::Num6:
-				AddPiece(5);
-				break;
-			case sf::Keyboard::Num7:
-				AddPiece(6);
-				break;
-			default:
-				break;
-			}
-		}
 	}
+		if (gameboard.GetGameState() == GameState::player0turn)
+		{
+			auto& a = gameboard.GetGameBoard();
+			std::vector<float> in;
+			for (auto& p : a)
+			{
+				switch (p)
+				{
+				case Pieces::none:
+					in.emplace_back(0.0f);
+					break;
+				case Pieces::player0:
+					in.emplace_back(0.5f);
+					break;
+				case Pieces::player1:
+					in.emplace_back(1.0f);
+					break;
+				default:
+					break;
+				}
+			}
+			auto out = nn0->Execute(in);
+			float max = -1000.0f;
+			int move;
+			for (size_t i = 0; i < out.size(); i++)
+			{
+				if (out[i] > max)
+				{
+					move = i;
+					max = out[i];
+				}
+			}
+			AddPiece(move);
+		}
+		else if (gameboard.GetGameState() == GameState::player1turn)
+		{
+			auto& a = gameboard.GetGameBoard();
+			std::vector<float> in;
+			for (auto& p : a)
+			{
+				switch (p)
+				{
+				case Pieces::none:
+					in.emplace_back(0.0f);
+					break;
+				case Pieces::player0:
+					in.emplace_back(0.5f);
+					break;
+				case Pieces::player1:
+					in.emplace_back(1.0f);
+					break;
+				default:
+					break;
+				}
+			}
+			auto out = nn1->Execute(in);
+			float max = -1000.0f;
+			int move;
+			for (size_t i = 0; i < out.size(); i++)
+			{
+				if (out[i] > max)
+				{
+					move = i;
+					max = out[i];
+				}
+			}
+			AddPiece(move);
+
+			/*
+			if (event.type == sf::Event::KeyPressed)
+			{
+				switch (event.key.code)
+				{
+				case sf::Keyboard::Num1:
+					AddPiece(0);
+					break;
+				case sf::Keyboard::Num2:
+					AddPiece(1);
+					break;
+				case sf::Keyboard::Num3:
+					AddPiece(2);
+					break;
+				case sf::Keyboard::Num4:
+					AddPiece(3);
+					break;
+				case sf::Keyboard::Num5:
+					AddPiece(4);
+					break;
+				case sf::Keyboard::Num6:
+					AddPiece(5);
+					break;
+				case sf::Keyboard::Num7:
+					AddPiece(6);
+					break;
+				default:
+					break;
+				}
+			}*/
+		}
+		else if (gameboard.GetGameState() == GameState::player0wins)
+		{
+			p0w++;
+			delete nn0;
+			delete nn1;
+			nn0 = new NeuralNetwork{ 1,{ 2 } };
+			nn1 = new NeuralNetwork{ 1,{ 2 } };
+			gameboard = GameBoard();
+		}
+		else if (gameboard.GetGameState() == GameState::player1wins)
+		{
+			p1w++;
+			delete nn0;
+			delete nn1;
+			nn0 = new NeuralNetwork{ 1,{ 2 } };
+			nn1 = new NeuralNetwork{ 1,{ 2 } };
+			gameboard = GameBoard();
+		}
+		else
+		{
+			delete nn0;
+			delete nn1;
+			nn0 = new NeuralNetwork{ 1,{ 2 } };
+			nn1 = new NeuralNetwork{ 1,{ 2 } };
+			gameboard = GameBoard();
+		}
+	
 }
 
 void GameBoardWindow::Draw()

@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "GameBoard.h"
+#include "NeuralNetwork.h"
 
 class GameBoardWindow
 {
@@ -19,4 +20,8 @@ private:
 	sf::RenderWindow win;
 	GameBoard gameboard;
 	std::vector<sf::CircleShape> PieceSprites;
+	NeuralNetwork * nn0 = new NeuralNetwork{ 6, {10,10,10,10,10,10} };
+	NeuralNetwork * nn1 = new NeuralNetwork{ 6, {10,10,10,10,10,10} };
+	long long int p0w = 0;
+	long long int p1w = 0;
 };

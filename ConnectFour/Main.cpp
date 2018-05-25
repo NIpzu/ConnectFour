@@ -1,5 +1,5 @@
 #include "GameBoardWindow.h"
-
+#include "NeuralNetwork.h"
 int main()
 {
 	GameBoardWindow gb;

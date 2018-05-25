@@ -29,7 +29,12 @@ GameState GameBoard::AddPiece(int iColumn)
 
 const std::vector<Pieces> GameBoard::GetGameBoard() const
 {
-	return std::vector<Pieces>(&board[0],&board[numColumns * numRows -1]);
+	return std::vector<Pieces>(&board[0],&board[numColumns * numRows]);
+}
+
+GameState GameBoard::GetGameState() const
+{
+	return state;
 }
 
 void GameBoard::ChangeTurn()
@@ -117,6 +122,45 @@ void GameBoard::CheckForVictory(int iOrigin)
 		}
 	}
 	if (xCount >= 4)
+	{
+		state = Win();
+		std::cout << "Player " << (state == GameState::player0wins ? "0" : "1") << " wins!" << std::endl;
+	}
+
+
+
+	int yCount = 1;
+	if (originY != numRows)
+	{
+
+		for (int y = originY + 1; y < std::min(originY + 4, numRows); y++)
+		{
+			if (board[y * numColumns + originX] == checkForPiece)
+			{
+				yCount++;
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+	if (originY != 0)
+	{
+
+		for (int y = originY - 1; y >= std::max(originY - 4, 0); y--)
+		{
+			if (board[y * numColumns + originX] == checkForPiece)
+			{
+				yCount++;
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+	if (yCount >= 4)
 	{
 		state = Win();
 		std::cout << "Player " << (state == GameState::player0wins ? "0" : "1") << " wins!" << std::endl;
