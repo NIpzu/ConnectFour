@@ -32,7 +32,7 @@ void GameBoardWindow::Update()
 		if (event.type == sf::Event::Closed)
 			win.close();
 	}
-		if (gameboard.GetGameState() == GameState::player0turn)
+		/*if (gameboard.GetGameState() == GameState::player0turn)
 		{
 			auto& a = gameboard.GetGameBoard();
 			std::vector<float> in;
@@ -100,7 +100,7 @@ void GameBoardWindow::Update()
 			}
 			AddPiece(move);
 
-			/*
+			
 			if (event.type == sf::Event::KeyPressed)
 			{
 				switch (event.key.code)
@@ -129,34 +129,20 @@ void GameBoardWindow::Update()
 				default:
 					break;
 				}
-			}*/
+			}
 		}
 		else if (gameboard.GetGameState() == GameState::player0wins)
 		{
-			p0w++;
-			delete nn0;
-			delete nn1;
-			nn0 = new NeuralNetwork{ GameBoard::numColumns * GameBoard::numRows,{ 2,2 },7 };
-			nn1 = new NeuralNetwork{ GameBoard::numColumns * GameBoard::numRows,{ 2,2 },7 };
 			gameboard = GameBoard();
 		}
 		else if (gameboard.GetGameState() == GameState::player1wins)
 		{
-			p1w++;
-			delete nn0;
-			delete nn1;
-			nn0 = new NeuralNetwork{ GameBoard::numColumns * GameBoard::numRows,{ 2,2 },7 };
-			nn1 = new NeuralNetwork{ GameBoard::numColumns * GameBoard::numRows,{ 2,2 },7 };
 			gameboard = GameBoard();
 		}
 		else
 		{
-			delete nn0;
-			delete nn1;
-			nn0 = new NeuralNetwork{ GameBoard::numColumns * GameBoard::numRows,{ 2,2 },7 };
-			nn1 = new NeuralNetwork{ GameBoard::numColumns * GameBoard::numRows,{ 2,2 },7 };
 			gameboard = GameBoard();
-		}
+		}*/
 	
 }
 

@@ -6,7 +6,7 @@ GameBoard::GameBoard()
 {
 }
 
-GameState GameBoard::AddPiece(int iColumn)
+GameState GameBoard::AddPiece(const int iColumn)
 {
 	if (CurrentPlayer() != Pieces::none)
 	{
@@ -84,7 +84,7 @@ Pieces GameBoard::CurrentPlayer() const
 	}
 }
 
-void GameBoard::CheckForVictory(int iOrigin)
+void GameBoard::CheckForVictory(const int iOrigin)
 {
 	const Pieces checkForPiece = board[iOrigin];
 	int originY = iOrigin / numColumns;
@@ -165,6 +165,4 @@ void GameBoard::CheckForVictory(int iOrigin)
 		state = Win();
 		std::cout << "Player " << (state == GameState::player0wins ? "0" : "1") << " wins!" << std::endl;
 	}
-
-
 }

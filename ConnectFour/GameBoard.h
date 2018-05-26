@@ -24,14 +24,14 @@ public:
 	static constexpr int numRows = 6;
 	static constexpr int numColumns = 7;
 	GameBoard();
-	GameState AddPiece(int iColumn);
+	GameState AddPiece(const int iColumn);
 	const std::vector<Pieces> GetGameBoard() const;
 	GameState GetGameState() const;
 private:
 	void ChangeTurn();
 	GameState Win() const;
 	Pieces CurrentPlayer() const;
-	void CheckForVictory(int iOrigin);
+	void CheckForVictory(const int iOrigin);
 private:
 	Pieces board[numRows * numColumns] = { Pieces::none };
 	GameState state = GameState::player0turn;

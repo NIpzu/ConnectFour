@@ -5,9 +5,9 @@
 
 struct Neuron
 {
-	float value;
 	std::vector<float> weights;
 	float bias;
+	float value;
 };
 
 struct Layer
@@ -26,14 +26,23 @@ private:
 	std::uniform_real_distribution<float> dist;
 };
 
+struct SavedNetwork
+{
+	std::vector<size_t> neuronsPerLayers;
+	std::vector<float> weights;
+	std::vector<float> biases;
+};
+
 class NeuralNetwork
 {
 public:
-	NeuralNetwork(const unsigned int numInputs,const std::vector<unsigned int>& numHiddenNeurons, const unsigned int  numOutputs);
-	void ConstructNextLayer(const unsigned int numNeurons);
+	NeuralNetwork(const size_t numInputs,const std::vector<size_t>& numHiddenNeurons, const size_t numOutputs, Rng& rng);
+	NeuralNetwork(const SavedNetwork& savedNetwork, Rng& rng);
+	void ConstructNextLayer(const size_t numNeurons);
 	std::vector<float> Compute(const std::vector<float>& inputs);
+	SavedNetwork GetSave() const;
 private:
 	std::vector<Layer> layers;
 	float Sigmoid(const float x) const;
-	Rng rng;
+	Rng& rng;
 };

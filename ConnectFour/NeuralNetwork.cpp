@@ -2,11 +2,13 @@
 #include <cmath>
 #include <assert.h>
 
-NeuralNetwork::NeuralNetwork(const unsigned int numInputs, const std::vector<unsigned int>& numHiddenNeurons, const unsigned int numOutputs)
+NeuralNetwork::NeuralNetwork(const size_t numInputs, const std::vector<size_t>& numHiddenNeurons, const size_t numOutputs, Rng& rng)
+	:
+	rng(rng)
 {
 	//Input layer
 	layers.emplace_back();
-	for (unsigned int i = 0; i < numInputs; i++)
+	for (size_t i = 0; i < numInputs; i++)
 	{
 		layers[layers.size() - 1].neurons.emplace_back();
 	}
@@ -14,37 +16,42 @@ NeuralNetwork::NeuralNetwork(const unsigned int numInputs, const std::vector<uns
 	//Hidden layers
 	for (auto& numNeurons : numHiddenNeurons)
 	{
-		/*layers.emplace_back();
-		for (unsigned int  i = 0; i < numNeurons; i++)
-		{
-			layers[layers.size() - 1].neurons.emplace_back();
-			for (size_t j = 0; j < layers[layers.size() - 2].neurons.size(); j++)
-			{
-				layers[layers.size() - 1].neurons[i].weights.emplace_back(rng.GetRandom());
-			}
-			layers[layers.size() - 1].neurons[i].bias = rng.GetRandom();
-		}*/
 		ConstructNextLayer(numNeurons);
 	}
 
 	//Output layer
-	/*layers.emplace_back();
-	for (unsigned int i = 0; i < numOutputs; i++)
-	{
-		layers[layers.size() - 1].neurons.emplace_back();
-		for (size_t j = 0; j < layers[layers.size() - 2].neurons.size(); j++)
-		{
-			layers[layers.size() - 1].neurons[i].weights.emplace_back(rng.GetRandom());
-		}
-		layers[layers.size() - 1].neurons[i].bias = rng.GetRandom();
-	}*/
 	ConstructNextLayer(numOutputs);
 }
 
-void NeuralNetwork::ConstructNextLayer(const unsigned int numNeurons)
+NeuralNetwork::NeuralNetwork(const SavedNetwork & savedNetwork, Rng& rng)
+	:
+	rng(rng)
+{
+	size_t previusNeurons = 0;
+	size_t weightsIndex = 0;
+	size_t biasesIndex = 0;
+	for (const auto& layerSize : savedNetwork.neuronsPerLayers)
+	{
+		layers.emplace_back();
+		layers[layers.size() - 1].neurons.resize(layerSize);
+		for (size_t i = 0; i < layerSize; i++)
+		{
+			for (size_t j = 0; j < previusNeurons; j++)
+			{
+				layers[layers.size() - 1].neurons[i].weights.emplace_back(savedNetwork.weights[weightsIndex]);
+				weightsIndex++;
+			}
+			layers[layers.size() - 1].neurons[i].bias = savedNetwork.biases[biasesIndex];
+			biasesIndex++;
+		}
+		previusNeurons = layerSize;
+	}
+}
+
+void NeuralNetwork::ConstructNextLayer(const size_t numNeurons)
 {
 	layers.emplace_back();
-	for (unsigned int i = 0; i < numNeurons; i++)
+	for (size_t i = 0; i < numNeurons; i++)
 	{
 		layers[layers.size() - 1].neurons.emplace_back();
 		for (size_t j = 0; j < layers[layers.size() - 2].neurons.size(); j++)
@@ -85,6 +92,24 @@ std::vector<float> NeuralNetwork::Compute(const std::vector<float>& inputs)
 	for (size_t i = 0; i < layers[layers.size() - 1].neurons.size(); i++)
 	{
 		out.emplace_back(layers[layers.size() - 1].neurons[i].value);
+	}
+	return std::move(out);
+}
+
+SavedNetwork NeuralNetwork::GetSave() const
+{
+	SavedNetwork out;
+	for (const auto& layer : layers)
+	{
+		out.neuronsPerLayers.emplace_back(layer.neurons.size());
+		for (const auto& neuron : layer.neurons)
+		{
+			for (const auto& weight : neuron.weights)
+			{
+				out.weights.emplace_back(weight);
+			}
+			out.biases.emplace_back(neuron.bias);
+		}
 	}
 	return std::move(out);
 }
