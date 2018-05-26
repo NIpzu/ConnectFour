@@ -3,33 +3,37 @@
 #include <random>
 #include "GameBoard.h"
 
+struct Neuron
+{
+	float value;
+	std::vector<float> weights;
+	float bias;
+};
+
+struct Layer
+{
+	std::vector<Neuron> neurons;
+};
+
+class Rng
+{
+public:
+	Rng();
+	float GetRandom();
+private:
+	std::random_device rd;
+	std::mt19937 rng;
+	std::uniform_real_distribution<float> dist;
+};
+
 class NeuralNetwork
 {
 public:
-	NeuralNetwork(int numLayers, std::vector<int> numNeurons);
-	std::vector<float> Execute(std::vector<float> inputs);
+	NeuralNetwork(const unsigned int numInputs,const std::vector<unsigned int>& numHiddenNeurons, const unsigned int  numOutputs);
+	void ConstructNextLayer(const unsigned int numNeurons);
+	std::vector<float> Compute(const std::vector<float>& inputs);
 private:
-	class Layer
-	{
-	public:
-		Layer(std::mt19937& rng, int numNeurons, int lastNeurons);
-		std::vector<float> Calculate(std::vector<float> in);
-	private:
-		class Neuron
-		{
-		public:
-			Neuron(std::mt19937& rng, int lastNeurons);
-			float GetValue(std::vector<float> in);
-		private:
-			std::vector<float> weights;
-			float bias;
-			float Sigmoid(float x) const;
-		};
-		std::vector<Neuron> neurons;
-	};
 	std::vector<Layer> layers;
-	Layer outputLayer;
-	static constexpr double e = 2.71828182845904523536028747135266249775724709369995;
-	std::random_device rd;
-	std::mt19937 rng;
+	float Sigmoid(const float x) const;
+	Rng rng;
 };

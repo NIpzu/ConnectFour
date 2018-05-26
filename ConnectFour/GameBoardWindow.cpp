@@ -53,14 +53,14 @@ void GameBoardWindow::Update()
 					break;
 				}
 			}
-			auto out = nn0->Execute(in);
+			auto out = nn0->Compute(in);
 			float max = -1000.0f;
 			int move;
 			for (size_t i = 0; i < out.size(); i++)
 			{
 				if (out[i] > max)
 				{
-					move = i;
+					move = (int)i;
 					max = out[i];
 				}
 			}
@@ -87,14 +87,14 @@ void GameBoardWindow::Update()
 					break;
 				}
 			}
-			auto out = nn1->Execute(in);
+			auto out = nn1->Compute(in);
 			float max = -1000.0f;
 			int move;
 			for (size_t i = 0; i < out.size(); i++)
 			{
 				if (out[i] > max)
 				{
-					move = i;
+					move = (int)i;
 					max = out[i];
 				}
 			}
@@ -136,8 +136,8 @@ void GameBoardWindow::Update()
 			p0w++;
 			delete nn0;
 			delete nn1;
-			nn0 = new NeuralNetwork{ 1,{ 2 } };
-			nn1 = new NeuralNetwork{ 1,{ 2 } };
+			nn0 = new NeuralNetwork{ GameBoard::numColumns * GameBoard::numRows,{ 2,2 },7 };
+			nn1 = new NeuralNetwork{ GameBoard::numColumns * GameBoard::numRows,{ 2,2 },7 };
 			gameboard = GameBoard();
 		}
 		else if (gameboard.GetGameState() == GameState::player1wins)
@@ -145,16 +145,16 @@ void GameBoardWindow::Update()
 			p1w++;
 			delete nn0;
 			delete nn1;
-			nn0 = new NeuralNetwork{ 1,{ 2 } };
-			nn1 = new NeuralNetwork{ 1,{ 2 } };
+			nn0 = new NeuralNetwork{ GameBoard::numColumns * GameBoard::numRows,{ 2,2 },7 };
+			nn1 = new NeuralNetwork{ GameBoard::numColumns * GameBoard::numRows,{ 2,2 },7 };
 			gameboard = GameBoard();
 		}
 		else
 		{
 			delete nn0;
 			delete nn1;
-			nn0 = new NeuralNetwork{ 1,{ 2 } };
-			nn1 = new NeuralNetwork{ 1,{ 2 } };
+			nn0 = new NeuralNetwork{ GameBoard::numColumns * GameBoard::numRows,{ 2,2 },7 };
+			nn1 = new NeuralNetwork{ GameBoard::numColumns * GameBoard::numRows,{ 2,2 },7 };
 			gameboard = GameBoard();
 		}
 	

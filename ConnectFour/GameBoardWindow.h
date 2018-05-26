@@ -20,8 +20,8 @@ private:
 	sf::RenderWindow win;
 	GameBoard gameboard;
 	std::vector<sf::CircleShape> PieceSprites;
-	NeuralNetwork * nn0 = new NeuralNetwork{ 6, {10,10,10,10,10,10} };
-	NeuralNetwork * nn1 = new NeuralNetwork{ 6, {10,10,10,10,10,10} };
+	NeuralNetwork * nn0 = new NeuralNetwork{ GameBoard::numColumns * GameBoard::numRows,{ 2,2 },7 };
+	NeuralNetwork * nn1 = new NeuralNetwork{ GameBoard::numColumns * GameBoard::numRows,{ 2,2 },7 };
 	long long int p0w = 0;
 	long long int p1w = 0;
 };
