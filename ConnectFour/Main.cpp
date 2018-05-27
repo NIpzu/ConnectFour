@@ -2,6 +2,45 @@
 #include "NeuralNetwork.h"
 #include <iostream>
 
+int PlayMatch(NeuralNetwork& nn0, NeuralNetwork& nn1)
+{
+	GameBoard gb;
+	std::vector<float> inputs;
+	while (true)
+	{
+		switch (gb.GetGameState())
+		{
+		case GameState::draw:
+			return 0;
+		case GameState::player0wins:
+			return 1;
+		case GameState::player1wins:
+			return -1;
+		case GameState::player0turn:
+			inputs.clear();
+			for (const auto& val : gb.GetGameBoard())
+			{
+				inputs.emplace_back(val == Pieces::none ?  0.0f : (val == Pieces::player0 ? 0.5f : 1.0f));
+			}
+			nn0.Compute(inputs);
+			if (gb.GetGameState() == GameState::invalidMove)
+				return -1;
+			break;
+		case GameState::player1turn:
+			inputs.clear();
+			for (const auto& val : gb.GetGameBoard())
+			{
+				inputs.emplace_back(val == Pieces::none ? 0.0f : (val == Pieces::player1 ? 0.5f : 1.0f));
+			}
+			nn1.Compute(inputs);
+			if (gb.GetGameState() == GameState::invalidMove)
+				return 1;
+			break;
+		default:
+			break;
+		}
+	}
+}
 
 int main()
 {
@@ -13,18 +52,31 @@ int main()
 	if (networks.size() == 0)
 	{
 		networks = evolver.nextGeneration();
+		networkScores.resize(networks.size());
 	}
 	else
 	{
-		size_t iPair0 = evolver.rng.GetRandomInt(0, networks.size() - 1);
-		NeuralNetwork pair0 = networks[iPair0];
-		networks.erase(networks.begin() + iPair0);
-
-		size_t iPair1 = evolver.rng.GetRandomInt(0, networks.size() - 1);
-		NeuralNetwork pair1 = networks[iPair1];
-		networks.erase(networks.begin() + iPair1);
-
-
+		for (size_t i = 0; i < networks.size(); i++)
+		{
+			for (size_t j = i; j < networks.size(); j++)
+			{
+				const int result = PlayMatch(networks[i], networks[j]);
+				if (result == -1)
+				{
+					networkScores[j] += 1.0f;
+					networkScores[i] -= 1.0f;
+				}
+				if (result == 1)
+				{
+					networkScores[i] += 1.0f;
+					networkScores[j] -= 1.0f;
+				}
+			}
+		}
+		for (size_t i = 0; i < networks.size(); i++)
+		{
+			evolver.ScoreNetwork(networks[i], networkScores[i]);
+		}
 	}
 
 
