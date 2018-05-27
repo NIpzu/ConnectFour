@@ -25,9 +25,9 @@ private:
 	float maxScore;
 	size_t numCurGen = 0;
 	const size_t inputs, outputs;
-	size_t population = 50;
+	size_t population = 100;
 	size_t numChildren = 1;
-	std::vector<size_t> hiddenLayers = {5,5,5};
+	std::vector<size_t> hiddenLayers = {50};
 	float mutationRate = 0.2f;
 	float mutationRange = 0.5f;
 	float elitism = 0.2f;

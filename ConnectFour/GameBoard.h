@@ -24,7 +24,7 @@ public:
 	static constexpr int numRows = 6;
 	static constexpr int numColumns = 7;
 	GameBoard();
-	GameState AddPiece(const int iColumn);
+	void AddPiece(const int iColumn);
 	const std::vector<Pieces> GetGameBoard() const;
 	GameState GetGameState() const;
 private:

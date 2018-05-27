@@ -13,8 +13,9 @@ GameBoardWindow::GameBoardWindow()
 	}
 }
 
-void GameBoardWindow::Play()
+void GameBoardWindow::Play(NeuralNetwork& nn)
 {
+	enemy = &nn;
 	while (win.isOpen())
 	{
 		win.clear();
@@ -31,10 +32,10 @@ void GameBoardWindow::Update()
 	{
 		if (event.type == sf::Event::Closed)
 			win.close();
-	}
-	
-		/*if (gameboard.GetGameState() == GameState::player0turn)
+
+		if (gameboard.GetGameState() == GameState::player0turn)
 		{
+
 			auto& a = gameboard.GetGameBoard();
 			std::vector<float> in;
 			for (auto& p : a)
@@ -54,7 +55,7 @@ void GameBoardWindow::Update()
 					break;
 				}
 			}
-			auto out = nn0->Compute(in);
+			auto out = enemy->Compute(in);
 			float max = -1000.0f;
 			int move;
 			for (size_t i = 0; i < out.size(); i++)
@@ -69,39 +70,7 @@ void GameBoardWindow::Update()
 		}
 		else if (gameboard.GetGameState() == GameState::player1turn)
 		{
-			auto& a = gameboard.GetGameBoard();
-			std::vector<float> in;
-			for (auto& p : a)
-			{
-				switch (p)
-				{
-				case Pieces::none:
-					in.emplace_back(0.0f);
-					break;
-				case Pieces::player0:
-					in.emplace_back(0.5f);
-					break;
-				case Pieces::player1:
-					in.emplace_back(1.0f);
-					break;
-				default:
-					break;
-				}
-			}
-			auto out = nn1->Compute(in);
-			float max = -1000.0f;
-			int move;
-			for (size_t i = 0; i < out.size(); i++)
-			{
-				if (out[i] > max)
-				{
-					move = (int)i;
-					max = out[i];
-				}
-			}
-			AddPiece(move);
 
-			
 			if (event.type == sf::Event::KeyPressed)
 			{
 				switch (event.key.code)
@@ -143,8 +112,8 @@ void GameBoardWindow::Update()
 		else
 		{
 			gameboard = GameBoard();
-		}*/
-
+		}
+	}
 		
 	
 }

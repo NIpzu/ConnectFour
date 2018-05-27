@@ -7,7 +7,7 @@ struct Neuron
 {
 	std::vector<float> weights;
 	float bias;
-	float value;
+	float value = 0.0f;
 };
 
 struct Layer

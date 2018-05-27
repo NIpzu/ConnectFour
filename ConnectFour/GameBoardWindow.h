@@ -7,7 +7,7 @@ class GameBoardWindow
 {
 public:
 	GameBoardWindow();
-	void Play();
+	void Play(NeuralNetwork& nn);
 private:
 	void Update();
 	void Draw();
@@ -20,5 +20,5 @@ private:
 	sf::RenderWindow win;
 	GameBoard gameboard;
 	std::vector<sf::CircleShape> PieceSprites;
-
+	NeuralNetwork * enemy;
 };

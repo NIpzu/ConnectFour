@@ -6,7 +6,7 @@ GameBoard::GameBoard()
 {
 }
 
-GameState GameBoard::AddPiece(const int iColumn)
+void GameBoard::AddPiece(const int iColumn)
 {
 	if (CurrentPlayer() != Pieces::none)
 	{
@@ -17,14 +17,13 @@ GameState GameBoard::AddPiece(const int iColumn)
 				board[i * numColumns + iColumn] = CurrentPlayer();
 				CheckForVictory(i * numColumns + iColumn);
 				ChangeTurn();
-				return state;
+				return;
 			}
 		}
 		state = GameState::invalidMove;
-		std::cout << "Invalid move!" << std::endl;
+		//std::cout << "Invalid move!" << std::endl;
 	}
-	std::cout << "Can't move now!" << std::endl;
-	return state;
+	//std::cout << "Can't move now!" << std::endl;
 }
 
 const std::vector<Pieces> GameBoard::GetGameBoard() const
@@ -86,15 +85,25 @@ Pieces GameBoard::CurrentPlayer() const
 
 void GameBoard::CheckForVictory(const int iOrigin)
 {
-	const Pieces checkForPiece = board[iOrigin];
-	int originY = iOrigin / numColumns;
-	int originX = iOrigin % numColumns;
-
-	int xCount = 1;
-	if (originX != numColumns)
+	if (std::any_of(std::begin(board), std::end(board), [](Pieces p) {return p == Pieces::none; }))
 	{
+		const Pieces checkForPiece = board[iOrigin];
+		int originY = iOrigin / numColumns;
+		int originX = iOrigin % numColumns;
 
-		for (int x = originX + 1; x < std::min(originX + 4, numColumns); x++)
+		int maxLeft = std::max(originX - 4, 0);
+		int maxDown = std::max(originY - 4, 0);
+		int maxRight = std::min(originX + 4, numColumns);
+		int maxUp = std::min(originY + 4, numRows);
+
+		int maxLeftMov = std::min(originX, 3);
+		int maxDownMov = std::min(originY, 3);
+		int maxRightMov = std::min(numColumns - originX, 3);
+		int maxUpMov = std::min(numRows - originY, 3);
+
+		int xCount = 1;
+
+		for (int x = originX + 1; x < maxRight; x++)
 		{
 			if (board[originY * numColumns + x] == checkForPiece)
 			{
@@ -105,11 +114,9 @@ void GameBoard::CheckForVictory(const int iOrigin)
 				break;
 			}
 		}
-	}
-	if (originX != 0)
-	{
 
-		for (int x = originX - 1; x >= std::max(originX - 4, 0); x--)
+
+		for (int x = originX - 1; x >= maxLeft; x--)
 		{
 			if (board[originY * numColumns + x] == checkForPiece)
 			{
@@ -120,20 +127,18 @@ void GameBoard::CheckForVictory(const int iOrigin)
 				break;
 			}
 		}
-	}
-	if (xCount >= 4)
-	{
-		state = Win();
-		std::cout << "Player " << (state == GameState::player0wins ? "0" : "1") << " wins!" << std::endl;
-	}
+
+		if (xCount >= 4)
+		{
+			state = Win();
+			//std::cout << "Player " << (state == GameState::player0wins ? "0" : "1") << " wins!" << std::endl;
+		}
 
 
 
-	int yCount = 1;
-	if (originY != numRows)
-	{
+		int yCount = 1;
 
-		for (int y = originY + 1; y < std::min(originY + 4, numRows); y++)
+		for (int y = originY + 1; y < maxUp; y++)
 		{
 			if (board[y * numColumns + originX] == checkForPiece)
 			{
@@ -144,11 +149,8 @@ void GameBoard::CheckForVictory(const int iOrigin)
 				break;
 			}
 		}
-	}
-	if (originY != 0)
-	{
 
-		for (int y = originY - 1; y >= std::max(originY - 4, 0); y--)
+		for (int y = originY - 1; y >= maxDown; y--)
 		{
 			if (board[y * numColumns + originX] == checkForPiece)
 			{
@@ -159,10 +161,77 @@ void GameBoard::CheckForVictory(const int iOrigin)
 				break;
 			}
 		}
+
+		if (yCount >= 4)
+		{
+			state = Win();
+			//std::cout << "Player " << (state == GameState::player0wins ? "0" : "1") << " wins!" << std::endl;
+		}
+
+		int xyCount = 0;
+		for (int xy = 0; xy < std::min(maxRightMov, maxUpMov); xy++)
+		{
+			if (board[(originY + xy) * numColumns + originX + xy] == checkForPiece)
+			{
+				xyCount++;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		for (int xy = 0; xy >= std::max(maxLeftMov, maxDownMov); xy--)
+		{
+			if (board[(originY + xy) * numColumns + originX + xy] == checkForPiece)
+			{
+				xyCount++;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		if (xyCount >= 4)
+		{
+			state = Win();
+		}
+
+
+
+		xyCount = 0;
+		for (int xy = 0; xy < std::min(maxRightMov, maxDownMov); xy++)
+		{
+			if (board[(originY - xy) * numColumns + originX + xy] == checkForPiece)
+			{
+				xyCount++;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		for (int xy = 0; xy >= std::max(maxLeftMov, maxUpMov); xy--)
+		{
+			if (board[(originY - xy) * numColumns + originX + xy] == checkForPiece)
+			{
+				xyCount++;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		if (xyCount >= 4)
+		{
+			state = Win();
+		}
 	}
-	if (yCount >= 4)
+	else
 	{
-		state = Win();
-		std::cout << "Player " << (state == GameState::player0wins ? "0" : "1") << " wins!" << std::endl;
+		state = GameState::draw;
 	}
 }

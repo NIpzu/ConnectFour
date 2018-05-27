@@ -123,7 +123,9 @@ void NeuroEvolver::ScoreNetwork(const NeuralNetwork network, const float score)
 		genome.network = network.GetSave();
 		genome.score = score;
 		currentGeneration.genomes.emplace_back(genome);
+		return;
 	}
+
 	for (auto i = currentGeneration.genomes.begin(); i < currentGeneration.genomes.end(); i++)
 	{
 		if (score > currentGeneration.genomes[i - currentGeneration.genomes.begin()].score)
@@ -132,6 +134,12 @@ void NeuroEvolver::ScoreNetwork(const NeuralNetwork network, const float score)
 			genome.network = network.GetSave();
 			genome.score = score;
 			currentGeneration.genomes.insert(i, genome);
+			return;
 		}
 	}
+
+	Genome genome;
+	genome.network = network.GetSave();
+	genome.score = score;
+	currentGeneration.genomes.insert(currentGeneration.genomes.end(), genome);
 }
