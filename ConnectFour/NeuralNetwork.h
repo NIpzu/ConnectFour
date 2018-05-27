@@ -20,6 +20,7 @@ class Rng
 public:
 	Rng();
 	float GetRandom();
+	int GetRandomInt(const int min, const int max);
 private:
 	std::random_device rd;
 	std::mt19937 rng;

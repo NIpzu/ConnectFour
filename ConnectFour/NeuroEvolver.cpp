@@ -16,6 +16,7 @@ std::vector<NeuralNetwork> NeuroEvolver::nextGeneration()
 		{
 			newGen.emplace_back(inputs, hiddenLayers, outputs,rng);
 		}
+		numCurGen++;
 		return newGen;
 	}
 	else
@@ -52,6 +53,7 @@ std::vector<NeuralNetwork> NeuroEvolver::nextGeneration()
 					else
 					{
 						currentGeneration = Generation();
+						numCurGen++;
 						return std::move(newGen);
 					}
 				}
@@ -115,6 +117,13 @@ std::vector<SavedNetwork> NeuroEvolver::Breed(const SavedNetwork & nn0, const Sa
 
 void NeuroEvolver::ScoreNetwork(const NeuralNetwork network, const float score)
 {
+	if (currentGeneration.genomes.size() == 0)
+	{
+		Genome genome;
+		genome.network = network.GetSave();
+		genome.score = score;
+		currentGeneration.genomes.emplace_back(genome);
+	}
 	for (auto i = currentGeneration.genomes.begin(); i < currentGeneration.genomes.end(); i++)
 	{
 		if (score > currentGeneration.genomes[i - currentGeneration.genomes.begin()].score)

@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "GameBoard.h"
-#include "NeuralNetwork.h"
+#include "NeuroEvolver.h"
 
 class GameBoardWindow
 {
@@ -20,4 +20,5 @@ private:
 	sf::RenderWindow win;
 	GameBoard gameboard;
 	std::vector<sf::CircleShape> PieceSprites;
+
 };

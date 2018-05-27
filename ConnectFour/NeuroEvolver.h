@@ -17,12 +17,12 @@ class NeuroEvolver
 public:
 	NeuroEvolver(const size_t inputs, const size_t outputs);
 	std::vector<NeuralNetwork> nextGeneration();
-	std::vector<SavedNetwork> Breed(const SavedNetwork& nn0, const SavedNetwork& nn1, const size_t numChildren);
 	void ScoreNetwork(const NeuralNetwork network, const float score);
+	Rng rng;
 private:
+	std::vector<SavedNetwork> Breed(const SavedNetwork& nn0, const SavedNetwork& nn1, const size_t numChildren);
 	Generation currentGeneration;
 	float maxScore;
-	Rng rng;
 	size_t numCurGen = 0;
 	const size_t inputs, outputs;
 	size_t population = 50;

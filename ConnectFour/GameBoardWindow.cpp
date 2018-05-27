@@ -32,6 +32,7 @@ void GameBoardWindow::Update()
 		if (event.type == sf::Event::Closed)
 			win.close();
 	}
+	
 		/*if (gameboard.GetGameState() == GameState::player0turn)
 		{
 			auto& a = gameboard.GetGameBoard();
@@ -143,6 +144,8 @@ void GameBoardWindow::Update()
 		{
 			gameboard = GameBoard();
 		}*/
+
+		
 	
 }
 

@@ -131,3 +131,9 @@ float Rng::GetRandom()
 	return dist(rng);
 }
 
+int Rng::GetRandomInt(const int min, const int max)
+{
+	std::uniform_int_distribution<int> intDist(min, max);
+	return intDist(rng);
+}
+
