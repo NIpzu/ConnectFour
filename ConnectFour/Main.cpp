@@ -70,8 +70,12 @@ void PlayGames(std::vector<NeuralNetwork>& networks, std::vector<float>& network
 
 int main()
 {
+	EvolvingSettings settings;
 
-	NeuroEvolver evolver(GameBoard::numColumns * GameBoard::numRows, GameBoard::numColumns);
+	settings.inputs = GameBoard::numColumns * GameBoard::numRows;
+	settings.outputs = GameBoard::numColumns;
+	settings.hiddenLayers = { 100 };
+	NeuroEvolver evolver(settings);
 	std::vector<NeuralNetwork> networks;
 	std::vector<float> networkScores;
 

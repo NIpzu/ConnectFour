@@ -118,12 +118,14 @@
     <ClCompile Include="GameBoard.cpp" />
     <ClCompile Include="GameBoardWindow.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Minmax.cpp" />
     <ClCompile Include="NeuralNetwork.cpp" />
     <ClCompile Include="NeuroEvolver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameBoard.h" />
     <ClInclude Include="GameBoardWindow.h" />
+    <ClInclude Include="Minmax.h" />
     <ClInclude Include="NeuralNetwork.h" />
     <ClInclude Include="NeuroEvolver.h" />
   </ItemGroup>

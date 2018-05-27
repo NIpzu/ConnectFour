@@ -1,9 +1,8 @@
 #include "NeuroEvolver.h"
 
-NeuroEvolver::NeuroEvolver(const size_t inputs, const size_t outputs)
+NeuroEvolver::NeuroEvolver(const EvolvingSettings& settings)
 	:
-	inputs(inputs),
-	outputs(outputs)
+	settings(settings)
 {
 }
 
@@ -12,28 +11,28 @@ std::vector<NeuralNetwork> NeuroEvolver::nextGeneration()
 	std::vector<NeuralNetwork> newGen;
 	if (numCurGen == 0)
 	{
-		for (size_t i = 0; i < population; i++)
+		for (size_t i = 0; i < settings.population; i++)
 		{
-			newGen.emplace_back(inputs, hiddenLayers, outputs,rng);
+			newGen.emplace_back(settings.inputs, settings.hiddenLayers, settings.outputs,rng);
 		}
 		numCurGen++;
 		return newGen;
 	}
 	else
 	{
-		for (size_t i = 0; i < size_t(elitism * float(population)); i++)
+		for (size_t i = 0; i < size_t(settings.elitism * float(settings.population)); i++)
 		{
-			if (newGen.size() < population)
+			if (newGen.size() < settings.population)
 			{
 				newGen.emplace_back(currentGeneration.genomes[i].network,rng);
 			}
 		}
 
-		for (size_t i = 0; i < size_t(randomBehaviour * float(population)); i++)
+		for (size_t i = 0; i < size_t(settings.randomBehaviour * float(settings.population)); i++)
 		{
-			if (newGen.size() < population)
+			if (newGen.size() < settings.population)
 			{
-				newGen.emplace_back(inputs, hiddenLayers, outputs, rng);
+				newGen.emplace_back(settings.inputs, settings.hiddenLayers, settings.outputs, rng);
 			}
 		}
 
@@ -43,10 +42,10 @@ std::vector<NeuralNetwork> NeuroEvolver::nextGeneration()
 		{
 			for (size_t i = 0; i < max; i++)
 			{
-				auto children = Breed(currentGeneration.genomes[i].network, currentGeneration.genomes[max].network, (numChildren > 0 ? numChildren : 1));
+				auto children = Breed(currentGeneration.genomes[i].network, currentGeneration.genomes[max].network, (settings.numChildren > 0 ? settings.numChildren : 1));
 				for (auto& child : children)
 				{
-					if (newGen.size() < population)
+					if (newGen.size() < settings.population)
 					{
 						newGen.emplace_back(child, rng);
 					}
@@ -99,16 +98,16 @@ std::vector<SavedNetwork> NeuroEvolver::Breed(const SavedNetwork & nn0, const Sa
 		}
 		for (auto& weight : children[i].weights)
 		{
-			if (rng.GetRandom() <= mutationRate)
+			if (rng.GetRandom() <= settings.mutationRate)
 			{
-				weight += rng.GetRandom() * 2 * mutationRange - mutationRange;
+				weight += rng.GetRandom() * 2 * settings.mutationRange - settings.mutationRange;
 			}
 		}
 		for (auto& bias : children[i].biases)
 		{
-			if (rng.GetRandom() <= mutationRate)
+			if (rng.GetRandom() <= settings.mutationRate)
 			{
-				bias += rng.GetRandom() * 2 * mutationRange - mutationRange;
+				bias += rng.GetRandom() * 2 * settings.mutationRange - settings.mutationRange;
 			}
 		}
 	}
