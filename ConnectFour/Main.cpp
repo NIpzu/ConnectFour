@@ -88,9 +88,7 @@ int main()
 
 	for (size_t g = 0; g < generations; g++)
 	{
-		std::cout << "Training gen " << g + 1 << std::endl;
-		//if (networks.size() == 0)
-		//{
+		std::cout << "Training generation " << g + 1 << std::endl;
 		networks = evolver.nextGeneration();
 		networkScores.clear();
 		networkScores.resize(networks.size());
@@ -98,9 +96,6 @@ int main()
 		{
 			s = 0.0f;
 		}
-		//}
-		//else
-		//{
 		if (numThreads != 1)
 		{
 			for (unsigned int j = 0; j < numThreads - 1; j++)
@@ -115,37 +110,11 @@ int main()
 			t.join();
 		}
 		threads.clear();
-		/*for (size_t j = i + 1; j < networks.size(); j++)
-		{
-			int result = PlayMatch(networks[i], networks[j]);
-			if (result == -1)
-			{
-				networkScores[j] += 1.0f;
-				networkScores[i] -= 1.0f;
-			}
-			if (result == 1)
-			{
-				networkScores[i] += 1.0f;
-				networkScores[j] -= 1.0f;
-			}
-			result = PlayMatch(networks[j], networks[i]);
-			if (result == -1)
-			{
-				networkScores[i] += 1.0f;
-				networkScores[j] -= 1.0f;
-			}
-			if (result == 1)
-			{
-				networkScores[j] += 1.0f;
-				networkScores[i] -= 1.0f;
-			}
-		}*/
 
 		for (size_t i = 0; i < networks.size(); i++)
 		{
 			evolver.ScoreNetwork(networks[i], networkScores[i]);
 		}
-		//}
 	}
 
 	GameBoardWindow gbw;
