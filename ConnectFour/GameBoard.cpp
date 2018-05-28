@@ -2,10 +2,6 @@
 #include <iostream>
 #include "GameBoard.h"
 
-GameBoard::GameBoard()
-{
-}
-
 void GameBoard::AddPiece(const int iColumn)
 {
 	if (CurrentPlayer() != Pieces::none)

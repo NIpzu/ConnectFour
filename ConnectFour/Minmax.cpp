@@ -11,9 +11,10 @@ float MinMaxNode::GetNodeValue(const int depth, const bool maximizingPlayer) con
 	if (maximizingPlayer)
 	{
 		float bestValue = -1.0f;
-		for (auto& child : GetChildren())
+		std::vector<std::unique_ptr<MinMaxNode>> children = (GetChildren());
+		for (size_t)
 		{
-			const float v = child.GetNodeValue(depth - 1, false);
+			const float v = child->GetNodeValue(depth - 1, false);
 			bestValue = std::max(v, bestValue);
 		}
 		return bestValue;
@@ -36,17 +37,17 @@ ConnectFourNode::ConnectFourNode(const GameBoard & board)
 {
 }
 
-std::vector<MinMaxNode> ConnectFourNode::GetChildren() const
+std::vector<std::unique_ptr<MinMaxNode>> ConnectFourNode::GetChildren() const
 {
-	std::vector<ConnectFourNode> out;
+	std::vector<const std::unique_ptr<MinMaxNode>> out;
 	for (size_t i = 0; i < GameBoard::numColumns; i++)
 	{
 		auto child = board;
 		child.AddPiece(i);
-		ConnectFourNode childNode(child);
+		ConnectFourNode childNode(std::move(child));
 		out.emplace_back(std::move(childNode));
 	}
-	return out;
+	return std::move(out);
 }
 
 bool ConnectFourNode::IsTerminal() const
@@ -56,5 +57,15 @@ bool ConnectFourNode::IsTerminal() const
 
 float ConnectFourNode::GetValue() const
 {
-	return 0.0f; //TODO
+	switch (board.GetGameState())
+	{
+	case GameState::draw:
+		return 0.0f;
+	case GameState::player0wins:
+		return 1.0f;
+	case GameState::player1wins:
+		return -1.0f;
+	default:
+		return 0.0f;
+	}
 }

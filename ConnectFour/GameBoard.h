@@ -23,7 +23,6 @@ class GameBoard
 public:
 	static constexpr int numRows = 6;
 	static constexpr int numColumns = 7;
-	GameBoard();
 	void AddPiece(const int iColumn);
 	const std::vector<Pieces> GetGameBoard() const;
 	GameState GetGameState() const;
