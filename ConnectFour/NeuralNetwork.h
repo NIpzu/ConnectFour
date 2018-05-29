@@ -42,8 +42,8 @@ public:
 	void ConstructNextLayer(const size_t numNeurons);
 	std::vector<float> Compute(const std::vector<float>& inputs);
 	SavedNetwork GetSave() const;
+	Rng& rng;
 private:
 	std::vector<Layer> layers;
 	float Sigmoid(const float x) const;
-	Rng& rng;
 };

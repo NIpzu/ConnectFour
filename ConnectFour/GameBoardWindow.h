@@ -21,4 +21,5 @@ private:
 	GameBoard gameboard;
 	std::vector<sf::CircleShape> PieceSprites;
 	NeuralNetwork * enemy;
+	Rng rng;
 };

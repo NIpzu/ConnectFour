@@ -10,7 +10,7 @@ float MinMaxNode::GetNodeValue(const int depth, const bool maximizingPlayer) con
 	}
 	if (maximizingPlayer)
 	{
-		float bestValue = -1.0f;
+		float bestValue = -100.0f;
 		std::vector<std::unique_ptr<MinMaxNode>> children = GetChildren();
 		for (size_t i = 0; i < children.size(); i++)
 		{
@@ -21,7 +21,7 @@ float MinMaxNode::GetNodeValue(const int depth, const bool maximizingPlayer) con
 	}
 	else
 	{
-		float bestValue = 1.0f;
+		float bestValue = 100.0f;
 		std::vector<std::unique_ptr<MinMaxNode>> children = GetChildren();
 		for (size_t i = 0; i < children.size(); i++)
 		{
