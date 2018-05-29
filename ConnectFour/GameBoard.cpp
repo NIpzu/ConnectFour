@@ -16,7 +16,7 @@ void GameBoard::AddPiece(const int iColumn)
 				return;
 			}
 		}
-		state = GameState::invalidMove;
+		state = Lose();
 		//std::cout << "Invalid move!" << std::endl;
 	}
 	//std::cout << "Can't move now!" << std::endl;
@@ -56,6 +56,22 @@ GameState GameBoard::Win() const
 		break;
 	case GameState::player1turn:
 		return GameState::player1wins;
+		break;
+	default:
+		return state;
+		break;
+	}
+}
+
+GameState GameBoard::Lose() const
+{
+	switch (state)
+	{
+	case GameState::player0turn:
+		return GameState::player1wins;
+		break;
+	case GameState::player1turn:
+		return GameState::player0wins;
 		break;
 	default:
 		return state;

@@ -1,5 +1,5 @@
 #include "GameBoardWindow.h"
-
+#include "Minmax.h"
 GameBoardWindow::GameBoardWindow()
 	:
 	win(sf::VideoMode(GameBoard::numColumns * circleDiameter, GameBoard::numRows * circleDiameter), "ConnectFour",sf::Style::Close | sf::Style::Titlebar,sf::ContextSettings(0,0,4))
@@ -32,89 +32,116 @@ void GameBoardWindow::Update()
 	{
 		if (event.type == sf::Event::Closed)
 			win.close();
-
-		if (gameboard.GetGameState() == GameState::player0turn)
+		if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased)
 		{
 
-			auto& a = gameboard.GetGameBoard();
-			std::vector<float> in;
-			for (auto& p : a)
+			if (gameboard.GetGameState() == GameState::player0turn)
 			{
-				switch (p)
-				{
-				case Pieces::none:
-					in.emplace_back(0.0f);
-					break;
-				case Pieces::player0:
-					in.emplace_back(0.5f);
-					break;
-				case Pieces::player1:
-					in.emplace_back(1.0f);
-					break;
-				default:
-					break;
-				}
-			}
-			auto out = enemy->Compute(in);
-			float max = -1000.0f;
-			int move;
-			for (size_t i = 0; i < out.size(); i++)
-			{
-				if (out[i] > max)
-				{
-					move = (int)i;
-					max = out[i];
-				}
-			}
-			AddPiece(move);
-		}
-		else if (gameboard.GetGameState() == GameState::player1turn)
-		{
 
-			if (event.type == sf::Event::KeyPressed)
-			{
-				switch (event.key.code)
+				auto& a = gameboard.GetGameBoard();
+				std::vector<float> in;
+				for (auto& p : a)
 				{
-				case sf::Keyboard::Num1:
-					AddPiece(0);
-					break;
-				case sf::Keyboard::Num2:
-					AddPiece(1);
-					break;
-				case sf::Keyboard::Num3:
-					AddPiece(2);
-					break;
-				case sf::Keyboard::Num4:
-					AddPiece(3);
-					break;
-				case sf::Keyboard::Num5:
-					AddPiece(4);
-					break;
-				case sf::Keyboard::Num6:
-					AddPiece(5);
-					break;
-				case sf::Keyboard::Num7:
-					AddPiece(6);
-					break;
-				default:
-					break;
+					switch (p)
+					{
+					case Pieces::none:
+						in.emplace_back(0.0f);
+						break;
+					case Pieces::player0:
+						in.emplace_back(0.5f);
+						break;
+					case Pieces::player1:
+						in.emplace_back(1.0f);
+						break;
+					default:
+						break;
+					}
 				}
+				auto out = enemy->Compute(in);
+				float max = -1000.0f;
+				int move;
+				for (size_t i = 0; i < out.size(); i++)
+				{
+					if (out[i] > max)
+					{
+						move = (int)i;
+						max = out[i];
+					}
+				}
+				AddPiece(move);
 			}
-		}
-		else if (gameboard.GetGameState() == GameState::player0wins)
-		{
-			gameboard = GameBoard();
-		}
-		else if (gameboard.GetGameState() == GameState::player1wins)
-		{
-			gameboard = GameBoard();
-		}
-		else
-		{
-			gameboard = GameBoard();
+			else if (gameboard.GetGameState() == GameState::player1turn)
+			{
+				ConnectFourNode base = gameboard;
+				auto children = base.GetChildren();
+				float bestVal = children[0]->GetNodeValue(2, false);
+				size_t iBestVal = 0;
+				for (size_t i = 1; i < children.size(); i++)
+				{
+					float Val = children[i]->GetNodeValue(2, false);
+					if (false)
+					{
+						if (bestVal < Val)
+						{
+							bestVal = Val;
+							iBestVal = i;
+						}
+					}
+					else
+					{
+						if (bestVal > Val)
+						{
+							bestVal = Val;
+							iBestVal = i;
+						}
+					}
+				}
+				gameboard.AddPiece(int(iBestVal));
+				/*
+				if (event.type == sf::Event::KeyPressed)
+				{
+					switch (event.key.code)
+					{
+					case sf::Keyboard::Num1:
+						AddPiece(0);
+						break;
+					case sf::Keyboard::Num2:
+						AddPiece(1);
+						break;
+					case sf::Keyboard::Num3:
+						AddPiece(2);
+						break;
+					case sf::Keyboard::Num4:
+						AddPiece(3);
+						break;
+					case sf::Keyboard::Num5:
+						AddPiece(4);
+						break;
+					case sf::Keyboard::Num6:
+						AddPiece(5);
+						break;
+					case sf::Keyboard::Num7:
+						AddPiece(6);
+						break;
+					default:
+						break;
+					}
+				}*/
+			}
+			else if (gameboard.GetGameState() == GameState::player0wins)
+			{
+				gameboard = GameBoard();
+			}
+			else if (gameboard.GetGameState() == GameState::player1wins)
+			{
+				gameboard = GameBoard();
+			}
+			else
+			{
+				gameboard = GameBoard();
+			}
 		}
 	}
-		
 	
 }
 

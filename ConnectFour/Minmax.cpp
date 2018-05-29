@@ -11,8 +11,8 @@ float MinMaxNode::GetNodeValue(const int depth, const bool maximizingPlayer) con
 	if (maximizingPlayer)
 	{
 		float bestValue = -1.0f;
-		std::vector<std::unique_ptr<MinMaxNode>> children = (GetChildren());
-		for (size_t i = i; i < children.size(); i++)
+		std::vector<std::unique_ptr<MinMaxNode>> children = GetChildren();
+		for (size_t i = 0; i < children.size(); i++)
 		{
 			const float v = children[i]->GetNodeValue(depth - 1, false);
 			bestValue = std::max(v, bestValue);
@@ -22,8 +22,8 @@ float MinMaxNode::GetNodeValue(const int depth, const bool maximizingPlayer) con
 	else
 	{
 		float bestValue = 1.0f;
-		std::vector<std::unique_ptr<MinMaxNode>> children = (GetChildren());
-		for (size_t i = i; i < children.size(); i++)
+		std::vector<std::unique_ptr<MinMaxNode>> children = GetChildren();
+		for (size_t i = 0; i < children.size(); i++)
 		{
 			const float v = children[i]->GetNodeValue(depth - 1, true);
 			bestValue = std::min(v, bestValue);
@@ -41,20 +41,19 @@ ConnectFourNode::ConnectFourNode(const GameBoard & board)
 std::vector<std::unique_ptr<MinMaxNode>> ConnectFourNode::GetChildren() const
 {
 	std::vector<std::unique_ptr<MinMaxNode>> out;
-	for (size_t i = 0; i < GameBoard::numColumns; i++)
+	for (int i = 0; i < GameBoard::numColumns; i++)
 	{
 		auto child = board;
 		child.AddPiece(i);
-		ConnectFourNode childNode(std::move(child));
-		std::unique_ptr<MinMaxNode> pChildNode = std::make_unique<MinMaxNode>(ConnectFourNode(std::move(child)));
-		out.push_back(pChildNode);
+		std::unique_ptr<MinMaxNode> pChildNode(new ConnectFourNode(child));
+		out.push_back(std::move(pChildNode));
 	}
 	return std::move(out);
 }
 
 bool ConnectFourNode::IsTerminal() const
 {
-	return !(board.GetGameState() == GameState::player0turn || board.GetGameState() == GameState::player1turn);
+	return !(board.GetGameState() == GameState::player0turn || board.GetGameState() == GameState::player1turn || board.GetGameState() == GameState::draw);
 }
 
 float ConnectFourNode::GetValue() const

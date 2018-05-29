@@ -7,8 +7,7 @@ enum class GameState
 	player1wins,
 	player0turn,
 	player1turn,
-	draw,
-	invalidMove
+	draw
 };
 
 enum class Pieces
@@ -29,6 +28,7 @@ public:
 private:
 	void ChangeTurn();
 	GameState Win() const;
+	GameState Lose() const;
 	Pieces CurrentPlayer() const;
 	void CheckForVictory(const int iOrigin);
 private:

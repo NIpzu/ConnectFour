@@ -2,12 +2,59 @@
 #include "NeuralNetwork.h"
 #include <iostream>
 #include <thread>
+#include "Minmax.h"
 
-int PlayMatch(NeuralNetwork nn0, NeuralNetwork nn1)
+void MakeMoveNN(NeuralNetwork nn, GameBoard& gb)
 {
-	GameBoard gb;
 	std::vector<float> inputs;
 	std::vector<float> outputs;
+	for (const auto& val : gb.GetGameBoard())
+	{
+		if (gb.GetGameState() == GameState::player0turn)
+		{
+			inputs.emplace_back(val == Pieces::none ? 0.0f : (val == Pieces::player1 ? -1.0f : 1.0f));
+		}
+		if (gb.GetGameState() == GameState::player1turn)
+		{
+			inputs.emplace_back(val == Pieces::none ? 0.0f : (val == Pieces::player0 ? -1.0f : 1.0f));
+		}
+	}
+	outputs = nn.Compute(inputs);
+	gb.AddPiece(int(outputs.begin() - std::max_element(outputs.begin(), outputs.end())));
+}
+
+void MakeMoveMM(GameBoard& gb, const int depth, const bool player0)
+{
+	ConnectFourNode base = gb;
+	auto children = base.GetChildren();
+	float bestVal =	children[0]->GetNodeValue(depth, player0);
+	size_t iBestVal = 0;
+	for (size_t i = 1; i < children.size(); i++)
+	{
+		float Val = children[i]->GetNodeValue(depth, player0);
+		if (player0)
+		{
+			if (bestVal < Val)
+			{
+				bestVal = Val;
+				iBestVal = i;
+			}
+		}
+		else
+		{
+			if (bestVal > Val)
+			{
+				bestVal = Val;
+				iBestVal = i;
+			}
+		}
+	}
+	gb.AddPiece(int(iBestVal));
+}
+
+int PlayMatchNN(NeuralNetwork nn0, NeuralNetwork nn1)
+{
+	GameBoard gb;
 	while (true)
 	{
 		switch (gb.GetGameState())
@@ -19,26 +66,10 @@ int PlayMatch(NeuralNetwork nn0, NeuralNetwork nn1)
 		case GameState::player1wins:
 			return -1;
 		case GameState::player0turn:
-			inputs.clear();
-			for (const auto& val : gb.GetGameBoard())
-			{
-				inputs.emplace_back(val == Pieces::none ?  0.0f : (val == Pieces::player0 ? -1.0f : 1.0f));
-			}
-			outputs = nn0.Compute(inputs);
-			gb.AddPiece(outputs.begin() - std::max_element(outputs.begin(), outputs.end()));
-			if (gb.GetGameState() == GameState::invalidMove)
-				return -1;
+			MakeMoveNN(nn0, gb);
 			break;
 		case GameState::player1turn:
-			inputs.clear();
-			for (const auto& val : gb.GetGameBoard())
-			{
-				inputs.emplace_back(val == Pieces::none ? 0.0f : (val == Pieces::player1 ? -1.0f : 1.0f));
-			}
-			outputs = nn1.Compute(inputs);
-			gb.AddPiece(std::max_element(outputs.begin(), outputs.end()) - outputs.begin());
-			if (gb.GetGameState() == GameState::invalidMove)
-				return 1;
+			MakeMoveNN(nn1, gb);
 			break;
 		default:
 			break;
@@ -46,13 +77,55 @@ int PlayMatch(NeuralNetwork nn0, NeuralNetwork nn1)
 	}
 }
 
-void PlayGames(std::vector<NeuralNetwork>& networks, std::vector<float>& networkScores, const size_t begin, const size_t end)
+float PlayMatchMM(NeuralNetwork nn, bool nnIsPlayer0)
+{
+	GameBoard gb;
+	float score = 0.0f;
+	while (true)
+	{
+		switch (gb.GetGameState())
+		{
+		case GameState::draw:
+			return 100.0f - score;
+		case GameState::player0wins:
+			return (nnIsPlayer0 ? 500.0f - score : score);
+		case GameState::player1wins:
+			return (!nnIsPlayer0 ? 500.0f - score: score);
+		case GameState::player0turn:
+			if (nnIsPlayer0)
+			{
+				MakeMoveNN(nn, gb);
+			}
+			else
+			{
+				MakeMoveMM(gb, 2, true);
+			}
+			score++;
+			break;
+		case GameState::player1turn:
+			if (!nnIsPlayer0)
+			{
+				MakeMoveNN(nn, gb);
+			}
+			else
+			{
+				MakeMoveMM(gb, 2, false);
+			}
+			score++;
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void PlayGamesNN(std::vector<NeuralNetwork>& networks, std::vector<float>& networkScores, const size_t begin, const size_t end)
 {
 	for (size_t i = begin; i < end; i++)
 	{
 		for (size_t j = 0; j < networks.size(); j++)
 		{
-			int result = PlayMatch(networks[i], networks[j]);
+			int result = PlayMatchNN(networks[i], networks[j]);
 			if (result == -1)
 			{
 				networkScores[j] += 1.0f;
@@ -65,6 +138,16 @@ void PlayGames(std::vector<NeuralNetwork>& networks, std::vector<float>& network
 			}
 			
 		}
+	}
+}
+
+void PlayGamesMM(std::vector<NeuralNetwork>& networks, std::vector<float>& networkScores, const size_t begin, const size_t end)
+{
+	for (size_t i = begin; i < end; i++)
+	{
+		float result = PlayMatchMM(networks[i], true);
+		result += PlayMatchMM(networks[i], false);
+		networkScores[i] += float(result);
 	}
 }
 
@@ -83,7 +166,7 @@ int main()
 
 	unsigned int numThreads = std::thread::hardware_concurrency();
 
-	if (numThreads == 0)
+	if ( false|| numThreads == 0)
 	{
 		numThreads = 1;
 	}
@@ -104,10 +187,10 @@ int main()
 		{
 			for (unsigned int j = 0; j < numThreads - 1; j++)
 			{
-				threads.emplace_back(&PlayGames, std::ref(networks), std::ref(networkScores), networks.size() / numThreads * j, networks.size() / numThreads * (j + 1));
+				threads.emplace_back(&PlayGamesMM, std::ref(networks), std::ref(networkScores), networks.size() / numThreads * j, networks.size() / numThreads * (j + 1));
 			}
 		}
-		threads.emplace_back(&PlayGames, std::ref(networks), std::ref(networkScores), networks.size() / numThreads * (numThreads - 1), networks.size());
+		threads.emplace_back(&PlayGamesMM, std::ref(networks), std::ref(networkScores), networks.size() / numThreads * (numThreads - 1), networks.size());
 
 		for (auto& t : threads)
 		{
@@ -119,6 +202,9 @@ int main()
 		{
 			evolver.ScoreNetwork(networks[i], networkScores[i]);
 		}
+		std::cout << networkScores[std::max_element(networkScores.begin(), networkScores.end()) - networkScores.begin()] << std::endl;
+		GameBoardWindow gbw;
+		gbw.Play(networks[std::max_element(networkScores.begin(), networkScores.end()) - networkScores.begin()]);
 	}
 
 	GameBoardWindow gbw;
